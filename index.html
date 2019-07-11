@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <title>Clipboard using async clipboard API</title>
   <meta name="description" content="">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
   <meta name="theme-color" content="#fafafa">
 
   <style>
@@ -13,11 +13,22 @@
 
     button { line-height: 40px; font-size: 24px; text-align: center; }
 
-    input { width: 100px; }
+    h2 { font-size: 32px; }
 
     .content { display: grid; grid-template-columns: 100px 1fr; }
 
-    pre { visibility: hidden; }
+    pre {
+      overflow-x: auto;
+      white-space: pre-wrap;
+      white-space: -moz-pre-wrap;
+      white-space: -pre-wrap;
+      white-space: -o-pre-wrap;
+      word-wrap: break-word;
+      text-indent: -1.2em;
+      padding-left: 1.2em;
+    }
+
+    #code { display: none; }
 
     #message {
       font-size: 24px;
@@ -27,10 +38,37 @@
     }
 
     #contents { color: green; }
+
+    @media (max-width: 800px)  {
+      h2 {
+        font-size: 4vw;
+      }
+    }
+
+    @media (max-width: 584px)  {
+      #message {
+        font-size: 20px;
+      }
+    }
+
+    @media (max-width: 520px)  {
+      .content {
+        display: block;
+      }
+      body {
+        font-size: 18px;
+      }
+    }
+
+    @media (max-width: 370px)  {
+      #message {
+        font-size: 16px;
+      }
+    }
   </style>
 </head>
 <body>
-  <h2>Copy and paste with Asynchronous Clipboard API</h2>
+  <h2>Copy/Paste with Async Clipboard API</h2>
   <hr>
   <h2 id="contents">Current clipboard contents: []</h2>
   <hr>
@@ -45,20 +83,21 @@
 
   <hr>
   <button onclick="show()">Show Javascript</button>
-  <pre>
-    const randomNumber = Math.random();
-    navigator.clipboard.writeText(randomNumber).then(...)
-    nextThing()
-  </pre>
+
+  <div id="code">
+    <pre>const randomNumber = Math.random();</pre>
+    <pre>navigator.clipboard.writeText(randomNumber).then(...)</pre>
+    <pre>nextThing()</pre>
+  </div>
   <script>
     const $input = document.getElementById('value');
     const $content = document.getElementById('content');
     const $contents = document.getElementById('contents');
-    const $pre = document.querySelector('pre');
+    const $code = document.getElementById('code');
     const delay = 2000;
 
     function show() {
-      $pre.style.visibility = 'visible';
+      $code.style.display = 'block';
     }
 
     function logMessage(message, isAppend) {
