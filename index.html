@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Clipboard using async clipboard API</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fafafa">
+
+  <style>
+    body { font-family: sans-serif; font-size: 24px; }
+
+    button { line-height: 40px; font-size: 24px; text-align: center; }
+
+    input { width: 100px; }
+
+    .content { display: grid; grid-template-columns: 100px 1fr; }
+
+    pre { visibility: hidden; }
+
+    #message {
+      font-size: 24px;
+      line-height: 40px;
+      font-weight: bold;
+      color: brown;
+    }
+
+    #contents { color: green; }
+  </style>
+</head>
+<body>
+  <h2>Copy and paste with Asynchronous Clipboard API</h2>
+  <hr>
+  <h2 id="contents">Current clipboard contents: []</h2>
+  <hr>
+  <div class="content">
+    <div class="left">
+      <button onclick="copy()">COPY</button>
+    </div>
+    <div class="right">
+      <div id="message"></div>
+    </div>
+  </div>
+
+  <hr>
+  <button onclick="show()">Show Javascript</button>
+  <pre>
+    const randomNumber = Math.random();
+    navigator.clipboard.writeText(randomNumber).then(...)
+    nextThing()
+  </pre>
+  <script>
+    const $input = document.getElementById('value');
+    const $content = document.getElementById('content');
+    const $contents = document.getElementById('contents');
+    const $pre = document.querySelector('pre');
+    const delay = 2000;
+
+    function show() {
+      $pre.style.visibility = 'visible';
+    }
+
+    function logMessage(message, isAppend) {
+      document.getElementById('message').innerText = isAppend
+        ? document.getElementById('message').innerText + '\n' + message
+        : message;
+    }
+
+    const generateRandomNumber = () => new Promise((resolve) => {
+      const randomNumber = Math.floor(Math.random() * 10000);
+      logMessage(`Generating a random number: ${randomNumber}`);
+      setTimeout(() => {
+        resolve(randomNumber);
+      }, delay);
+    });
+
+    const copyText = (randomNumber) => new Promise((resolve) => {  
+      logMessage(`Copy to clipboard`, true);
+      navigator.clipboard.writeText(randomNumber)
+        .then(() => resolve());
+    });
+
+    const selectAndCopyInput = () => new Promise((resolve) => {  
+      logMessage(`Select input field and call document.execCommand('copy')`, true);
+      $input.select();
+      document.execCommand('copy');
+      resolve();
+    });
+
+    function copy() {
+      generateRandomNumber()
+        .then(copyText)
+        .catch((err) => console.log(err.message));
+    }
+
+    function paste() {
+      navigator.clipboard.readText()
+        .then((text) => logMessage(`${text} read from clipboard.`))
+        .catch((err) => logMessage(`Error occurred: ${err.message}`));
+    }
+
+    function showClipboardContents() {
+      navigator.clipboard.readText()
+        .then((text) => $contents.textContent = `Current clipboard contents: [${text}]`)
+        .catch((err) => $contents.textContent = err.message)
+        .then(() => {
+          setTimeout(() => {
+            showClipboardContents();
+          }, 200);
+        });
+    }
+    function emptyClipboard() {
+      navigator.clipboard.writeText("")
+        .then(() => showClipboardContents())
+        .catch((err) => $contents.textContent = err.message);
+    }
+    emptyClipboard();
+  </script>
+</body>
+</html>
+
+
